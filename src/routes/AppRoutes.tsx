@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router'
 import { PokeGrid } from '../features/PokeGrid/PokeGrid'
 import { Pokedex } from '../features/Pokedex/Pokedex'
-import { Landing } from '../features/Landing/Lading'
+import { Landing } from '../features/Landing/Landing'
 
 export function AppRoutes() {
   return (
