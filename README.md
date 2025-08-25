@@ -84,7 +84,7 @@ A modern Pokédex application developed as part of the **Pinflag Technical Chall
 git clone https://github.com/lennardscript/pinflag-pokeapi
 
 # Navigate to directory
-cd pokedex-app
+cd pingflag-pokeapi
 
 # Install dependencies with pnpm
 pnpm install
