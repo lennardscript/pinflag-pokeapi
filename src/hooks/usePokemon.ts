@@ -30,16 +30,16 @@ export const usePokemonDetails = (idOrName: string | undefined) => {
   })
 }
 
-export const usePokemonSpecies = (id: number | undefined) => {
+export const usePokemonSpecies = (id?: number) => {
   return useQuery<PokemonSpecies>({
     queryKey: ['pokemon-species', id],
     queryFn: () => getPokemonSpecies(id!),
-    enabled: !!id,
+    enabled: typeof id === 'number' && id > 0,
     staleTime: 10 * 60 * 1000,
   })
 }
 
-export const useCompletePokemonData = (idOrName: string | undefined) => {
+export const useCompletePokemonData = (idOrName?: string) => {
   const detailsQuery = usePokemonDetails(idOrName)
   const speciesQuery = usePokemonSpecies(detailsQuery.data?.id)
 
