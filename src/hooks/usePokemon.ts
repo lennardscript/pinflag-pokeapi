@@ -7,7 +7,8 @@ import {
   getPokemonIdFromUrl,
   type PokemonListResponse,
   type Pokemon,
-  type PokemonSpecies
+  type PokemonSpecies,
+  getEnglishDescription
 } from '../services/pokeapi'
 
 export const usePokemonList = (page: number = 0, limit: number = 30) => {
@@ -45,6 +46,7 @@ export const useCompletePokemonData = (idOrName: string | undefined) => {
   return {
     pokemon: detailsQuery.data,
     species: speciesQuery.data,
+    description: speciesQuery.data ? getEnglishDescription(speciesQuery.data) : '',
     isLoading: detailsQuery.isLoading || speciesQuery.isLoading,
     isError: detailsQuery.isError || speciesQuery.isError,
     error: detailsQuery.error || speciesQuery.error,

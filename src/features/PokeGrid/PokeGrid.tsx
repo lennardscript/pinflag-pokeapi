@@ -1,4 +1,6 @@
 export function PokeGrid() {
-  return <>
-  </>
+  return (
+
+    <></>
+  )
 }
