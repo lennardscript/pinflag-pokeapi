@@ -72,8 +72,11 @@ export const getPokemonSpecies = async (id: number): Promise<PokemonSpecies> => 
 }
 
 export const getPokemonIdFromUrl = (url: string): number => {
-  const matches = url.match(/\/(\d+)\/$/)
-  return matches ? parseInt(matches[1]) : 0
+  if (typeof url !== 'string') {
+    return 0;
+  }
+  const matches = url.match(/\/(\d+)\/$/);
+  return matches ? parseInt(matches[1]) : 0;
 }
 
 export const getEnglishDescription = (species: PokemonSpecies): string => {

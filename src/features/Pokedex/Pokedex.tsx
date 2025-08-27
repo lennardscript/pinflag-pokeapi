@@ -32,16 +32,18 @@ export function Pokedex() {
     queryKey: ['pokemon', pokemonId],
     queryFn: () => getPokemonDetails(pokemonId!),
     enabled: !!pokemonId,
+    staleTime: Infinity
   })
 
   const { data: species } = useQuery({
     queryKey: ['pokemon-species', idNum],
     queryFn: () => getPokemonSpecies(idNum!),
     enabled: !!idNum && !!pokemon,
+    staleTime: Infinity
   })
 
   function handleBackClick() {
-    navigate('/pokegrid')
+    navigate(-1)
   }
 
   if (error) {
@@ -63,7 +65,7 @@ export function Pokedex() {
   if (isLoading || !pokemon) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center" role="status" aria-live="polite" aria-busy="true">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-white text-lg">Loading Pokémon data...</p>
         </div>
@@ -71,7 +73,7 @@ export function Pokedex() {
     )
   }
 
-  const primaryType = pokemon.types[0].type.name
+  const primaryType = pokemon?.types?.[0]?.type?.name || 'normal'
 
   const description =
     species?.flavor_text_entries.find(entry => entry.language.name === 'en')
@@ -112,11 +114,8 @@ export function Pokedex() {
                 <h3 className="text-lg font-semibold text-gray-700">Type</h3>
                 <div className="flex justify-center gap-3">
                   {pokemon.types.map(typeInfo => (
-                    <span
-                      key={typeInfo.type.name}
-                      className={`${typeColors[typeInfo.type.name] || 'bg-gray-400'} text-white font-semibold px-6 py-2 rounded-full capitalize text-lg`}
-                    >
-                      {typeInfo.type.name}
+                    <span key={typeInfo.type.name} className={`${typeColors[typeInfo.type.name] || 'bg-gray-400'} text-white font-semibold px-6 py-2 rounded-full capitalize text-lg`}>
+                      {typeInfo.type.name.charAt(0).toUpperCase() + typeInfo.type.name.slice(1)}
                     </span>
                   ))}
                 </div>
@@ -149,7 +148,7 @@ export function Pokedex() {
                       .replace('attack', 'Attack')
                       .replace('defense', 'Defense')
                       .replace('special-attack', 'Sp. Attack')
-                      .replace('special-defense', 'Sp. Defense')
+                      .replace('special-defense', 'Sp. Def')
                       .replace('speed', 'Speed')
 
                     return (

@@ -103,8 +103,10 @@ export function PokeGrid() {
 
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex-1 max-w-md">
+            <div className="flex-1 max-w-md w-full">
+              <label htmlFor="search-pokemon" className="sr-only">Search Pokémon by name</label>
               <input
+                id='search-pokemon'
                 type="text"
                 placeholder="Search Pokémon by name..."
                 value={searchTerm}
@@ -114,6 +116,7 @@ export function PokeGrid() {
             </div>
             <button
               onClick={handleFavoritesToggle}
+              aria-label={showFavoritesOnly ? 'Hide favorites and show all Pokémon' : 'Show only favorite Pokémon'}
               className={`px-6 py-2 rounded-lg font-semibold transition-colors ${showFavoritesOnly
                 ? 'bg-yellow-500 text-white hover:bg-yellow-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -133,7 +136,7 @@ export function PokeGrid() {
         </div>
 
         {(isLoadingList || (isLoadingDetails && !shouldShowGrid && !shouldShowEmpty)) && (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex items-center justify-center py-16" role="status" aria-live="polite">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
               <p className="text-gray-600 text-lg">Loading Pokémon...</p>
@@ -220,61 +223,66 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
   totalPages: number;
   onPageChange: (page: number) => void
 }) {
-  const pagesToShow = 5
-
-  let startPage = Math.max(1, currentPage - Math.floor(pagesToShow / 2))
-  let endPage = Math.min(totalPages, startPage + pagesToShow - 1)
-
-  if (endPage - startPage + 1 < pagesToShow) {
-    startPage = Math.max(1, endPage - pagesToShow + 1)
-  }
-
-  const pageNumbers = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i
-  )
+  const pagesToShow = 5;
+  const generatePageNumbers = useMemo(() => {
+    const pageNumbers = [];
+    let startPage = Math.max(1, currentPage - Math.floor(pagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + pagesToShow - 1);
+    if (endPage - startPage + 1 < pagesToShow) {
+      startPage = Math.max(1, endPage - pagesToShow + 1);
+    }
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
+  }, [currentPage, totalPages, pagesToShow]);
 
   return (
-    <div className="flex items-center justify-center space-x-2 py-8">
+    <nav aria-label="Pokémon Pagination" className="flex items-center justify-center space-x-2 py-8">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+        className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
+        aria-label="Previous page"
       >
         Previous
       </button>
 
-      {startPage > 1 && (
+      {generatePageNumbers[0] > 1 && (
         <>
           <button
             onClick={() => onPageChange(1)}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            aria-label="Go to page 1"
           >
             1
           </button>
-          {startPage > 2 && <span className="px-2 py-2 text-gray-400">...</span>}
+          {generatePageNumbers[0] > 2 && <span className="px-2 py-2 text-gray-400">...</span>}
         </>
       )}
 
-      {pageNumbers.map(pageNumber => (
+      {generatePageNumbers.map(pageNumber => (
         <button
           key={pageNumber}
           onClick={() => onPageChange(pageNumber)}
-          className={`px-4 py-2 border rounded-lg transition-colors ${currentPage === pageNumber
+          className={`px-4 py-2 border rounded-lg transition-colors shadow-sm ${currentPage === pageNumber
             ? 'bg-blue-500 text-white border-blue-500'
             : 'bg-white border-gray-300 hover:bg-gray-50'
             }`}
+          aria-label={`Go to page ${pageNumber}`}
+          aria-current={currentPage === pageNumber ? 'page' : undefined}
         >
           {pageNumber}
         </button>
       ))}
 
-      {endPage < totalPages && (
+      {generatePageNumbers[generatePageNumbers.length - 1] < totalPages && (
         <>
-          {endPage < totalPages - 1 && <span className="px-2 py-2 text-gray-400">...</span>}
+          {generatePageNumbers[generatePageNumbers.length - 1] < totalPages - 1 && <span className="px-2 py-2 text-gray-400">...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            aria-label={`Go to page ${totalPages}`}
           >
             {totalPages}
           </button>
@@ -284,10 +292,11 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+        className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
+        aria-label="Next page"
       >
         Next
       </button>
-    </div>
+    </nav>
   )
 }
