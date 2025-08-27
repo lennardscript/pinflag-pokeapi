@@ -29,18 +29,18 @@ export const useFavoriteStore = create<FavoriteStore>()(
         })),
 
       toggleFavorite: (id) => {
-        const isFav = get().isFavorite(id)
-        if (isFav) {
-          get().removeFavorite(id)
-        } else {
-          get().addFavorite(id)
-        }
+        set((state) => {
+          const isFavorite = state.favorites.includes(id)
+          return {
+            favorites: isFavorite
+              ? state.favorites.filter((favId) => favId !== id)
+              : [...state.favorites, id]
+          }
+        })
       },
 
       isFavorite: (id) => get().favorites.includes(id),
-
       getFavoritesCount: () => get().favorites.length,
-
       clearAllFavorites: () => set({ favorites: [] }),
     }),
     {
